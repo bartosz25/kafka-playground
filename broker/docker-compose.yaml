@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    networks:
+      kafka-playground-network:
+        ipv4_address: 210.0.0.10
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - 'zookeeper_data:/bitnami'
+  kafka:
+    image: 'bitnami/kafka:latest'
+    depends_on:
+      - zookeeper
+    networks:
+      kafka-playground-network:
+        ipv4_address: 210.0.0.20
+    ports:
+      - '9092:9092'
+    volumes:
+      - 'kafka_data:/bitnami'
+      - './log4j.properties:/tmp/log4j.properties'
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=210.0.0.10:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://210.0.0.20:9092
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+      - KAFKA_OPTS=-Dlog4j.configuration=file:/tmp/log4j.properties
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+
+networks:
+  kafka-playground-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 210.0.0.0/16
