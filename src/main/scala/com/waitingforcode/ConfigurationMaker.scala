@@ -4,7 +4,7 @@ import java.util.Properties
 
 object ConfigurationMaker {
 
-  private val ServerAddress = "210.0.0.20:9092"
+  private val ServerAddress = "localhost:29092"
 
   def configureProducer(clientId: String = s"auto_${System.currentTimeMillis()}",
                         keySerializer: String = "org.apache.kafka.common.serialization.StringSerializer",
